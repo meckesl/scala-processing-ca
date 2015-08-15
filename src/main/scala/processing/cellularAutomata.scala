@@ -13,19 +13,19 @@ object Scala2dCA {
 class RunCA extends PApplet {
 
   var iter = 0
-  var gen = Seq[Boolean]()
-  var rule = Seq[Boolean]()
+  var gen, rule = Seq[Boolean]()
+  val res = 8
 
   override def settings() {
-    size(800, 600)
+    fullScreen()
   }
 
   override def setup() {
-    frameRate(1000);
+    frameRate(100);
     background(255, 255, 255)
     noStroke()
     iter = 0
-    gen = 1 to width map (_ => Random.nextBoolean)
+    gen = 1 to width/res map (_ => Random.nextBoolean)
     rule = 1 to 8 map (_ => Random.nextBoolean)
   }
 
@@ -38,52 +38,50 @@ class RunCA extends PApplet {
     gen = computeCA(rule, gen)
     gen.zipWithIndex.foreach {
       case (cell, index) => {
-        if (cell == true) fill(0) else fill(255)
-        rect(index, iter, 1, 1)
+        if (cell) fill(0) else fill(255)
+        rect(index*res, iter*res, res, res)
       }
     }
 
     iter = iter + 1
-    if (iter == height) setup
+    if (iter == height/res) setup
   }
 
 
-  def computeCA(rule: Seq[Boolean], curgen: Seq[Boolean]): Seq[Boolean] = {
+  def computeCA(rule: Seq[Boolean], gen: Seq[Boolean]): Seq[Boolean] = {
 
-    def generate: Seq[Boolean] = {
+    implicit def b2i(b: Boolean) = if (b) 1 else 0
 
-      def nextchild(a: Seq[Boolean], rule: Seq[Boolean]): Boolean = {
-        require(a.length == 3, "Provide prev, cur, and next cell values")
-        var n = 0;
-        a.foreach {
-          case (x) => {
-            n = (n << 1) + (if (x) 1 else 0)
-          }
-        }
-        rule(n)
-      }
-
-      var newgen = Seq[Boolean]()
-      var prev, next = false;
-      curgen.zipWithIndex.foreach {
-        case (cur, i) => {
-          if (i == 0) {
-            prev = curgen(curgen.length - 1);
-            next = curgen(i + 1)
-          } else if (i == curgen.length - 1) {
-            next = curgen.head;
-            prev = curgen(i - 1)
-          } else {
-            prev = curgen(i - 1);
-            next = curgen(i + 1)
-          }
-          newgen = newgen :+ nextchild(Seq(prev, cur, next), rule)
+    def computeChild(siblings: Seq[Boolean]): Boolean = {
+      require(siblings.length == 3, "Provide prev, cur, and next cell for parent generation")
+      var n = 0;
+      siblings.foreach {
+        case (x) => {
+          n = (n << 1) + x
         }
       }
-      newgen
+      rule(n)
     }
 
-    generate
+    var newgen = Seq[Boolean]()
+    var prev, next = false;
+    gen.zipWithIndex.foreach {
+      case (cur, i) => {
+        if (i == 0) {
+          prev = gen(gen.length - 1);
+          next = gen(i + 1)
+        } else if (i == gen.length - 1) {
+          next = gen.head;
+          prev = gen(i - 1)
+        } else {
+          prev = gen(i - 1);
+          next = gen(i + 1)
+        }
+        newgen = newgen :+ computeChild(Seq(prev, cur, next))
+      }
+    }
+    newgen
+
   }
 
 }
