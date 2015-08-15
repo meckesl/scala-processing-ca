@@ -29,7 +29,7 @@ class RunCA extends PApplet {
     rule = 1 to 8 map (_ => Random.nextBoolean)
   }
 
-  override def keyPressed(): Unit = {
+  override def keyPressed() {
     setup()
   }
 
@@ -49,41 +49,18 @@ class RunCA extends PApplet {
 
 
   def computeCA(rule: Seq[Boolean], curgen: Seq[Boolean]): Seq[Boolean] = {
-    
+
     def generate: Seq[Boolean] = {
 
-      def nextchild(a: Boolean, b: Boolean, c: Boolean, rule: Seq[Boolean]): Boolean = {
-
-        if (a == true) {
-          if (b == true) {
-            if (c == true) {
-              return rule(0)
-            } else {
-              return rule(1)
-            }
-          } else {
-            if (c == true) {
-              return rule(2)
-            } else {
-              return rule(3)
-            }
-          }
-        } else {
-          if (b == true) {
-            if (c == true) {
-              return rule(4)
-            } else {
-              return rule(5)
-            }
-          } else {
-            if (c == true) {
-              return rule(6)
-            } else {
-              return rule(7)
-            }
+      def nextchild(a: Seq[Boolean], rule: Seq[Boolean]): Boolean = {
+        require(a.length == 3, "Provide prev, cur, and next cell values")
+        var n = 0;
+        a.foreach {
+          case (x) => {
+            n = (n << 1) + (if (x) 1 else 0)
           }
         }
-
+        rule(n)
       }
 
       var newgen = Seq[Boolean]()
@@ -100,7 +77,7 @@ class RunCA extends PApplet {
             prev = curgen(i - 1);
             next = curgen(i + 1)
           }
-          newgen = newgen :+ nextchild(prev, cur, next, rule)
+          newgen = newgen :+ nextchild(Seq(prev, cur, next), rule)
         }
       }
       newgen
