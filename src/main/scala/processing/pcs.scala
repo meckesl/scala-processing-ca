@@ -5,8 +5,8 @@ import processing.core._
 import scala.util._
 
 object Pcs {
-  def main(args: Array[String]): Unit = {
-    processing.core.PApplet.main(Array("--present", "processing.Sample"));
+  def main(args: Array[String]) {
+    PApplet.main(Array("--present", "processing.Sample"))
   }
 }
 
@@ -30,7 +30,7 @@ class Sample extends PApplet {
       def randA = a(Random.nextInt(2))
       p = p.zip(randA).map { case (x, y) => x / 2 + y }
       stroke(p(2), p(3), p(4))
-      point(p(0), p(1))
+      point(p.head, p(1))
     }
   }
 

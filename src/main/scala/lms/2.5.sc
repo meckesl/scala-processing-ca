@@ -22,3 +22,9 @@ val z = new Rational(3, 2)
 
 x.sub(y).sub(z)
 
+var boo = List[Boolean]()
+boo = false :: boo
+boo = true :: boo
+boo
+
+
