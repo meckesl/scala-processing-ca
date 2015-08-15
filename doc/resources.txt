@@ -1,0 +1,2 @@
+http://twitter.github.io/effectivescala/
+https://www.coursera.org/course/progfun

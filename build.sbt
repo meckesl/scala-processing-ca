@@ -6,5 +6,6 @@ lazy val commonSettings = Seq(
 
 lazy val root = (project in file(".")).
   settings(
-    name := "scalaBootstrap"
+    name := "scalaBootstrap",
+    libraryDependencies += "org.processing" % "core" % "3.0b3"
   )
