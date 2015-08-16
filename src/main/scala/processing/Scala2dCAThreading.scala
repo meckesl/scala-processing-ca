@@ -14,10 +14,10 @@ object Scala2dCAThreading {
 
 class RunCAThreading extends PApplet {
 
-  val res = 1
-  val complexity = 7
+  val res = 2
+  val complexity = 3
   var gen, rule = Vector[Boolean]()
-  var screenbuffer = List[Boolean]()
+  var screenbuffer = Vector[Boolean]()
   var screenOffset = 0
   var t = CAThread
 
@@ -26,6 +26,13 @@ class RunCAThreading extends PApplet {
     noSmooth
     fullScreen
     initVars
+
+    println("---- CA simulation starts ----")
+    println("Screen resolution: " + width + "*" + height)
+    println("Simulation resolution: " + res + " pixel per cell -> " + width / res + "*" + height / res)
+    println("Complexity: " + complexity + " -> " + (complexity - 1) / 2 + " siblings on each side for child computation")
+    println("Rule definition size: " + rule.length + "bit")
+    println("Total of possible rules: " + math.pow(2, rule.length).toLong)
   }
 
   override def setup {
@@ -43,10 +50,12 @@ class RunCAThreading extends PApplet {
     }
     gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
     rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
-    screenbuffer = List[Boolean]()
+    screenbuffer = Vector[Boolean]()
     screenOffset = 0
     t = CAThread
     t.start
+    println("---- New rule starts ----")
+    println("Rule ID: " + rule.map { case (x) => if (x) 1 else 0 }.mkString)
   }
 
   def CAThread = new Thread("CA") {
@@ -77,16 +86,12 @@ class RunCAThreading extends PApplet {
 
     screenOffset = screenOffset + todraw.length
 
-    println("so: " + screenOffset + " sc: " + screenCellCount)
     if (screenOffset > screenCellCount) {
       t.stop
-      screenbuffer = List[Boolean]()
+      screenbuffer = Vector[Boolean]()
       screenOffset = 0
       t = CAThread
       t.start
     }
-
   }
-
-
 }
