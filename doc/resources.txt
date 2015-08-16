@@ -2,6 +2,7 @@ Scala
 http://twitter.github.io/effectivescala/
 https://www.coursera.org/course/progfun
 http://docs.scala-lang.org/overviews/collections/performance-characteristics.html
+https://github.com/mbonaci/scala
 
 Git
 https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow

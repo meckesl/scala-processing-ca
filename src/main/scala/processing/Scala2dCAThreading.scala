@@ -14,8 +14,8 @@ object Scala2dCAThreading {
 
 class RunCAThreading extends PApplet {
 
-  val res = 2
-  val complexity = 3
+  val res = 1
+  val complexity = 5
   var gen, rule = Vector[Boolean]()
   var screenbuffer = Vector[Boolean]()
   var screenOffset = 0
@@ -49,13 +49,18 @@ class RunCAThreading extends PApplet {
       t.stop
     }
     gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
+
+    // Interesting rules
+    // 00111011
+    // 01110100110111001000010011011010, 01010011100000011110110000110101
     rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
+
     screenbuffer = Vector[Boolean]()
     screenOffset = 0
     t = CAThread
     t.start
     println("---- New rule starts ----")
-    println("Rule ID: " + rule.map { case (x) => if (x) 1 else 0 }.mkString)
+    println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
   }
 
   def CAThread = new Thread("CA") {
@@ -73,14 +78,14 @@ class RunCAThreading extends PApplet {
 
   override def draw {
 
-    def findline(x: Int) = (screenOffset + x) / (width / res)
-    def findcol(y: Int) = (screenOffset + y) % (width / res)
+    def findline(x: Int) = ((screenOffset + x) / (width / res) * res)
+    def findcol(y: Int) = ((screenOffset + y) % (width / res) * res)
 
-    val todraw = screenbuffer.slice(screenOffset, screenbuffer.length)
+    val todraw = screenbuffer drop screenOffset
     todraw.zipWithIndex.foreach {
       case (cell, index) => {
         if (cell) fill(0) else fill(255)
-        rect(findcol(index) * res, findline(index) * res, res, res)
+        rect(findcol(index), findline(index), res, res)
       }
     }
 
