@@ -9,11 +9,7 @@ object CellularAutomata {
     def computeChild(siblings: Seq[Boolean]): Boolean = {
       require(siblings.length.equals(3), "Provide prev, cur, and next cell for parent generation")
       var n = 0
-      siblings.foreach {
-        case (x) => {
-          n = (n << 1) + x
-        }
-      }
+      siblings.foreach { case (s) => n = (n << 1) + s }
       rule(n)
     }
 
@@ -33,7 +29,8 @@ object CellularAutomata {
         }
         newgen = newgen :+ computeChild(Seq(prev, cur, next))
     }
-    newgen
+
+    return newgen
 
   }
 
