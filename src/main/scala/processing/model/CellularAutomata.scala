@@ -2,11 +2,11 @@ package processing.model
 
 object CellularAutomata {
 
-  def computeCA(gen: Seq[Boolean], rule: Seq[Boolean]): Seq[Boolean] = {
+  def compute(gen: Seq[Boolean], rule: Seq[Boolean]): Seq[Boolean] = {
 
     implicit def b2i(b: Boolean) = if (b) 1 else 0
 
-    def computeChild(siblings: Seq[Boolean]): Boolean = {
+    def child(siblings: Seq[Boolean]): Boolean = {
       require(siblings.length.equals(3), "Provide prev, cur, and next cell for parent generation")
       var n = 0
       siblings.foreach { case (s) => n = (n << 1) + s }
@@ -27,7 +27,7 @@ object CellularAutomata {
           prev = gen(i - 1)
           next = gen(i + 1)
         }
-        newgen = newgen :+ computeChild(Seq(prev, cur, next))
+        newgen = newgen :+ child(Seq(prev, cur, next))
     }
 
     return newgen
