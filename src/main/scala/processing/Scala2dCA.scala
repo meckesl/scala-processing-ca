@@ -13,8 +13,8 @@ object Scala2dCA {
 
   private class RunCA extends PApplet {
 
-    var gen, rule = Seq[Boolean]()
-    var screen = Seq[Boolean]()
+    var gen, rule = Vector[Boolean]()
+    var screen = Vector[Boolean]()
     var iter = 0
     val res = 16
 
@@ -24,8 +24,8 @@ object Scala2dCA {
 
     override def setup {
       iter = 0
-      gen = 1 to width / res map (_ => Random.nextBoolean())
-      rule = 1 to 8 map (_ => Random.nextBoolean())
+      gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
+      rule = (1 to 8 map (_ => Random.nextBoolean())).toVector
     }
 
     override def keyPressed {

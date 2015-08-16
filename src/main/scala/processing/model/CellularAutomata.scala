@@ -2,7 +2,7 @@ package processing.model
 
 object CellularAutomata {
 
-  def compute(gen: Seq[Boolean], rule: Seq[Boolean]): Seq[Boolean] = {
+  def compute(gen: Vector[Boolean], rule: Vector[Boolean]): Vector[Boolean] = {
 
     implicit def b2i(b: Boolean) = if (b) 1 else 0
 
@@ -13,7 +13,7 @@ object CellularAutomata {
       rule(n)
     }
 
-    var newgen = Seq[Boolean]()
+    var newgen = Vector[Boolean]()
     var prev, next = false
     gen.zipWithIndex.foreach {
       case (cur, i) =>
