@@ -34,7 +34,7 @@ object Scala2dCA {
 
     override def draw {
 
-      gen = compute(gen, rule)
+      gen = compute(gen, rule, 3)
       screen +: gen
       gen.zipWithIndex.foreach {
         case (cell, index) =>

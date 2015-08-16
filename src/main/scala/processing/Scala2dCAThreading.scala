@@ -15,8 +15,9 @@ object Scala2dCAThreading {
 class RunCAThreading extends PApplet {
 
   val res = 1
+  val complexity = 7
   var gen, rule = Vector[Boolean]()
-  var screen = Seq[Boolean]()
+  var screenbuffer = List[Boolean]()
   var screenOffset = 0
   var t = CAThread
 
@@ -41,8 +42,8 @@ class RunCAThreading extends PApplet {
       t.stop
     }
     gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
-    rule = (1 to math.pow(2, 3).toInt map (_ => Random.nextBoolean())).toVector
-    screen = Vector[Boolean]()
+    rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
+    screenbuffer = List[Boolean]()
     screenOffset = 0
     t = CAThread
     t.start
@@ -51,9 +52,9 @@ class RunCAThreading extends PApplet {
   def CAThread = new Thread("CA") {
     override def run {
       while (true) {
-        if (screen.length < screenCellCount) {
-          gen = compute(gen, rule)
-          screen = screen ++ gen
+        if (screenOffset < screenCellCount) {
+          gen = compute(gen, rule, complexity)
+          screenbuffer = screenbuffer ++ gen
         }
       }
     }
@@ -64,20 +65,26 @@ class RunCAThreading extends PApplet {
   override def draw {
 
     def findline(x: Int) = (screenOffset + x) / (width / res)
-    def findcol(x: Int) = (screenOffset + x) % (width / res)
+    def findcol(y: Int) = (screenOffset + y) % (width / res)
 
-    val todraw = screen.slice(screenOffset, screen.length)
+    val todraw = screenbuffer.slice(screenOffset, screenbuffer.length)
     todraw.zipWithIndex.foreach {
       case (cell, index) => {
-        val curline = findline(index)
-        val curcol = findcol(index)
         if (cell) fill(0) else fill(255)
-        rect(curcol * res, curline * res, res, res)
+        rect(findcol(index) * res, findline(index) * res, res, res)
       }
     }
 
     screenOffset = screenOffset + todraw.length
-    if (screenOffset > screenCellCount) initVars
+
+    println("so: " + screenOffset + " sc: " + screenCellCount)
+    if (screenOffset > screenCellCount) {
+      t.stop
+      screenbuffer = List[Boolean]()
+      screenOffset = 0
+      t = CAThread
+      t.start
+    }
 
   }
 
