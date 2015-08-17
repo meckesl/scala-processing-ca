@@ -45,7 +45,7 @@ object CellularAutomata {
       case (cur, i) =>
         prev = findPrev(i, (complexity-1)/2)
         next = findNext(i, (complexity-1)/2)
-        newgen = newgen :+ child(prev ::: List(cur) ::: next)
+        newgen :+= child(prev ::: List(cur) ::: next)
     }
 
     return newgen
