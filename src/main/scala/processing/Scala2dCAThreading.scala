@@ -1,11 +1,11 @@
 package processing
 
 import processing.core._
+import processing.awt._
 import processing.model.CellularAutomata._
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import scala.math._
 
 object Scala2dCAThreading {
 
@@ -17,19 +17,50 @@ object Scala2dCAThreading {
 class RunCAThreading extends PApplet {
 
   val res = 1
-  val complexity = 5
-  var screenbuffer = mutable.ArrayBuffer[Boolean]()
+  val complexity = 3
+  var screenbuffer = ArrayBuffer[Boolean]()
   var screenOffset = 0
+
   def screenCellCount = (width * height) / (res * res)
-  var t = CAThread
+
+  val t = new Thread() {
+
+    var rule, gen = Vector[Boolean]()
+    var pause = false
+
+    def init {
+      pause = true
+      rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
+      gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
+      screenbuffer.clear
+      screenOffset = 0
+      println("---- New rule starts ----")
+      println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
+      pause = false
+    }
+
+    override def run {
+      while (pause == false) {
+        gen = compute(gen, rule, complexity)
+        screenbuffer.appendAll(gen)
+      }
+      run
+    }
+  }
 
   override def settings {
-    size(2560, 1440)
+    size(2560, 1440)//, "processing.opengl.PGraphics2D")
     fullScreen
-    initVars
-    t = CAThread
-    t.start
+  }
 
+  override def setup {
+    frameRate(25)
+    noStroke
+    noSmooth
+
+
+    t.init
+    t.start
     println("---- CA simulation starts ----")
     println("Screen resolution: " + width + "*" + height)
     println("Simulation resolution: " + res + " pixel per cell -> " + width / res + "*" + height / res)
@@ -38,43 +69,19 @@ class RunCAThreading extends PApplet {
     println("Total of possible rules: " + math.pow(2, math.pow(2, complexity)).toLong)
   }
 
-  override def setup {
-    frameRate(1)
-    noStroke
-  }
-
   override def keyPressed {
-    initVars
+    t.init
   }
 
-  def initVars {
+  /*def initVars {
 
     // Interesting rules
     // 00111011
     // 01110100110111001000010011011010, 01010011100000011110110000110101
     // 11011111010100001011001010101110100111000011001110010110101010101101110000101101101000111011101101001001110100111000101100111111
 
-    t.rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
-    t.gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
-    screenbuffer.clear
-    screenOffset = 0
-
-    println("---- New rule starts ----")
-    println("Rule ID: " + t.rule.map { case (b) => if (b) 1 else 0 }.mkString)
-  }
-
-  def CAThread = new Thread() {
-
-    var rule = Vector[Boolean]()
-    var gen = Vector[Boolean]()
-
-    override def run {
-      while (true) {
-        gen = compute(gen, rule, complexity)
-        screenbuffer.appendAll(gen)
-      }
-    }
-  }
+    t.init
+  }*/
 
   override def draw {
 
@@ -90,11 +97,13 @@ class RunCAThreading extends PApplet {
     }
 
     screenOffset = screenOffset + towrite
-    screenbuffer.remove(0,towrite)
+    screenbuffer.remove(0, towrite)
 
     if (screenOffset >= screenCellCount) {
+      t.pause = true
       screenbuffer.clear
       screenOffset = 0
+      t.pause = false
     }
   }
 }

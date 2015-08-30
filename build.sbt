@@ -7,5 +7,7 @@ lazy val commonSettings = Seq(
 lazy val root = (project in file(".")).
   settings(
     name := "scalaBootstrap",
-    libraryDependencies += "org.processing" % "core" % "3.0b3"
+    libraryDependencies += "org.processing" % "core" % "3.0b3",
+    libraryDependencies += "org.jogamp.jogl" % "jogl-all" % "2.3.1",
+    libraryDependencies += "org.jogamp.gluegen" % "gluegen-rt" % "2.3.1"
   )
