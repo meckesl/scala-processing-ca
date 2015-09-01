@@ -6,14 +6,14 @@ import processing.model.CellularAutomata._
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-object Scala2dCAThreading {
+object Scala2dCAActors {
 
   def main(args: Array[String]): Unit = {
-    PApplet.main(Array("--present", "processing.RunCAThreading"))
+    PApplet.main(Array("--present", "processing.RunCAActors"))
   }
 }
 
-class RunCAThreading extends PApplet {
+class RunCAActors extends PApplet {
 
   val res = 1
   val complexity = 5
