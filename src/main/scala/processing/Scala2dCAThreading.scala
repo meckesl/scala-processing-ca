@@ -16,7 +16,7 @@ object Scala2dCAThreading {
 class RunCAThreading extends PApplet {
 
   val res = 1
-  val complexity = 5
+  val complexity = 7
 
   def screenCellCount = (width * height) / (res * res)
 
@@ -31,7 +31,9 @@ class RunCAThreading extends PApplet {
 
     def init {
       pause = true
-      while (doInit == false) {print('.')}
+      while (doInit == false) {
+        print('.')
+      }
       rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
       gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
       screenbuffer.clear
@@ -44,7 +46,7 @@ class RunCAThreading extends PApplet {
     override def run {
       while (true) {
         if (pause == false) {
-          gen = compute(gen, rule, complexity)
+          gen = compute(gen, rule, (complexity - 1) / 2).toVector
           println("new gen of len: " + gen.length)
           screenbuffer.appendAll(gen)
           doInit = false

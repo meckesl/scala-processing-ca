@@ -1,10 +1,14 @@
 package processing
 
+import akka.actor.{ActorRef, Actor}
 import processing.core._
 import processing.model.CellularAutomata._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+
+case object RestartSimulation
+case class Chunk(bits: Vector[Boolean])
 
 object Scala2dCAActors {
 
@@ -13,7 +17,40 @@ object Scala2dCAActors {
   }
 }
 
-class RunCAActors extends PApplet {
+/*val t = new Thread() {
+
+var rule, gen = Vector[Boolean]()
+var pause = true
+var doInit = true
+
+def init {
+pause = true
+while (doInit == false) {print('.')}
+rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
+gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
+screenbuffer.clear
+screenOffset = 0
+println("---- New rule starts ----")
+println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
+pause = false
+}
+
+override def run {
+while (true) {
+if (pause == false) {
+gen = compute(gen, rule, complexity)
+println("new gen of len: " + gen.length)
+screenbuffer.appendAll(gen)
+doInit = false
+} else {
+print(',')
+doInit = true
+}
+}
+}
+}*/
+
+class RunCAActors(x: ActorRef) extends PApplet with Actor {
 
   val res = 1
   val complexity = 5
@@ -23,37 +60,8 @@ class RunCAActors extends PApplet {
   var screenbuffer = ArrayBuffer[Boolean]()
   var screenOffset = 0
 
-  val t = new Thread() {
-
-    var rule, gen = Vector[Boolean]()
-    var pause = true
-    var doInit = true
-
-    def init {
-      pause = true
-      while (doInit == false) {print('.')}
-      rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
-      gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
-      screenbuffer.clear
-      screenOffset = 0
-      println("---- New rule starts ----")
-      println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
-      pause = false
-    }
-
-    override def run {
-      while (true) {
-        if (pause == false) {
-          gen = compute(gen, rule, complexity)
-          println("new gen of len: " + gen.length)
-          screenbuffer.appendAll(gen)
-          doInit = false
-        } else {
-          print(',')
-          doInit = true
-        }
-      }
-    }
+  def receive = {
+    case Chunk(vec) => println("lol")
   }
 
   override def settings {
@@ -66,8 +74,6 @@ class RunCAActors extends PApplet {
     frameRate(25)
     noStroke
 
-    t.init
-    t.start
     println("---- CA simulation starts ----")
     println("Screen resolution: " + width + "*" + height)
     println("Screen cell count: " + screenCellCount)
@@ -78,7 +84,7 @@ class RunCAActors extends PApplet {
   }
 
   override def keyPressed {
-    if (key.equals(' ')) t.init
+    if (key.equals(' ')) x ! RestartSimulation
   }
 
   // Interesting rules

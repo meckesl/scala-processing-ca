@@ -35,7 +35,7 @@ class RunCA extends PApplet {
 
   override def draw {
 
-    gen = compute(gen, rule, 3)
+    gen = compute(gen, rule, 3).toVector
     gen.zipWithIndex.foreach {
       case (cell, index) =>
         if (cell) fill(0) else fill(255)

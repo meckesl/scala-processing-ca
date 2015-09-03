@@ -2,7 +2,13 @@ Scala
 http://twitter.github.io/effectivescala/
 https://www.coursera.org/course/progfun
 http://docs.scala-lang.org/overviews/collections/performance-characteristics.html
+http://www.scala-lang.org/docu/files/collections-api/collections_40.html
 https://github.com/mbonaci/scala
+http://www.scala-lang.org/old/node/8610
+https://pragprog.com/magazines/2012-01/scala-for-the-intrigued
+
+Scala Actors
+http://www.reactive.io/tips/2014/04/08/parallel-computing-made-easy-with-scala-and-akka/
 
 Git
 https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow

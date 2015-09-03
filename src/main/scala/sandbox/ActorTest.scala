@@ -4,14 +4,16 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 
 object ActorTest extends App {
 
-  /**
-   * BARISTA
-   */
   sealed trait CoffeeRequest
   case object CappuccinoRequest extends CoffeeRequest
   case object EspressoRequest extends CoffeeRequest
+  case object CaffeineWithdrawalWarning
   case class Bill(cents: Int)
   case object ClosingTime
+
+  /**
+   * BARISTA
+   */
   class Barista extends Actor {
     def receive = {
       case CappuccinoRequest =>
@@ -27,14 +29,12 @@ object ActorTest extends App {
   /**
    * CUSTOMER
    */
-  case object CaffeineWithdrawalWarning
   class Customer(caffeineSource: ActorRef) extends Actor {
     def receive = {
       case CaffeineWithdrawalWarning => caffeineSource ! EspressoRequest
       case Bill(cents) => println(s"I have to pay $cents cents, or else!")
     }
   }
-
 
   // Define actor system
   val system = ActorSystem("Barista")
