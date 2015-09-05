@@ -1,8 +1,8 @@
-package processing.model
+package com.lms.ca.model
 
 object CellularAutomata {
 
-  def compute(gen: => Vector[Boolean], rule: Seq[Boolean], complexity: Int): Vector[Boolean] = {
+  def compute(gen: => Seq[Boolean], rule: Seq[Boolean], complexity: Int): Seq[Boolean] = {
 
     def child(siblings: Seq[Boolean]): Boolean = {
       implicit def b2i(b: Boolean) = if (b) 1 else 0

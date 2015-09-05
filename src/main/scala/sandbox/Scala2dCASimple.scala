@@ -1,7 +1,7 @@
-package processing
+package sandbox
 
+import com.lms.ca.model.CellularAutomata._
 import processing.core._
-import processing.model.CellularAutomata._
 
 import scala.util.Random
 
