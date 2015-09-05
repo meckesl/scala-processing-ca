@@ -20,7 +20,7 @@ object CellularAutomata {
     }
 
     gen.zipWithIndex.map {
-      case (cell, i) => child(find(-i) ::: List(cell) ::: find(i))
+      case (c, i) => child(find(-i) ::: List(c) ::: find(i))
     }
 
   }

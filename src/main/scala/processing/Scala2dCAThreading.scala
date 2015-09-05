@@ -3,7 +3,7 @@ package processing
 import processing.core._
 import processing.model.CellularAutomata._
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.SynchronizedQueue
 import scala.util.Random
 
 object Scala2dCAThreading {
@@ -16,47 +16,11 @@ object Scala2dCAThreading {
 class RunCAThreading extends PApplet {
 
   val res = 1
-  val complexity = 7
-
-  def screenCellCount = (width * height) / (res * res)
-
-  var screenbuffer = ArrayBuffer[Boolean]()
+  val complexity = 5
+  val screenBuffer = new SynchronizedQueue[Vector[Boolean]]
   var screenOffset = 0
 
-  val t = new Thread() {
-
-    var rule, gen = Vector[Boolean]()
-    var pause = true
-    var doInit = true
-
-    def init {
-      pause = true
-      while (doInit == false) {
-        print('.')
-      }
-      rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
-      gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
-      screenbuffer.clear
-      screenOffset = 0
-      println("---- New rule starts ----")
-      println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
-      pause = false
-    }
-
-    override def run {
-      while (true) {
-        if (pause == false) {
-          gen = compute(gen, rule, (complexity - 1) / 2).toVector
-          println("new gen of len: " + gen.length)
-          screenbuffer.appendAll(gen)
-          doInit = false
-        } else {
-          print(',')
-          doInit = true
-        }
-      }
-    }
-  }
+  def screenCellCount = (width * height) / (res * res)
 
   override def settings {
     size(2560, 1440) //, "processing.opengl.PGraphics2D")
@@ -65,9 +29,8 @@ class RunCAThreading extends PApplet {
   }
 
   override def setup {
-    frameRate(25)
+    frameRate(32)
     noStroke
-
     t.init
     t.start
     println("---- CA simulation starts ----")
@@ -80,33 +43,55 @@ class RunCAThreading extends PApplet {
   }
 
   override def keyPressed {
-    if (key.equals(' ')) t.init
+    if (key.equals(' ')) {
+      screenBuffer.clear
+      screenOffset = 0
+      t.init
+    }
   }
 
-  // Interesting rules
-  // 00111011
-  // 01110100110111001000010011011010, 01010011100000011110110000110101
-  // 11011111010100001011001010101110100111000011001110010110101010101101110000101101101000111011101101001001110100111000101100111111
+  val t = new Thread() {
+
+    var rule, gen = Vector[Boolean]()
+
+    def init {
+      // Interesting rules
+      // 00111011
+      // 01110100110111001000010011011010, 01010011100000011110110000110101
+      // 11011111010100001011001010101110100111000011001110010110101010101101110000101101101000111011101101001001110100111000101100111111
+      rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
+      gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
+      println("---- New rule starts ----")
+      println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
+    }
+
+    override def run {
+      while (true) {
+        gen = compute(gen, rule, (complexity - 1) / 2)
+        screenBuffer.enqueue(gen)
+      }
+    }
+  }
 
   override def draw {
 
-    val todraw = screenbuffer.length
     def findline(x: Int) = (screenOffset + x) / (width / res) * res
     def findcol(y: Int) = (screenOffset + y) % (width / res) * res
 
-    screenbuffer.take(todraw).zipWithIndex.foreach {
-      case (cell, index) => {
-        if (cell) fill(0) else fill(255)
-        rect(findcol(index), findline(index), res, res)
-      }
-    }
-
-    screenOffset = screenOffset + todraw
-    screenbuffer.remove(0, todraw)
-
-    if (screenOffset >= screenCellCount) {
-      screenbuffer.clear
-      screenOffset = 0
+    screenBuffer.dequeueAll(gen => true).foreach {
+      case (gen: Vector[Boolean]) =>
+        gen.zipWithIndex.foreach {
+          case (c, i) =>
+            if (c) fill(0) else fill(255)
+            rect(findcol(i), findline(i), res, res)
+        }
+        screenOffset = screenOffset + gen.length
+        if (screenOffset >= screenCellCount) {
+          screenBuffer.clear
+          screenOffset = 0
+        }
     }
   }
+
+
 }
