@@ -2,8 +2,7 @@ package processing
 
 import processing.core._
 import processing.model.CellularAutomata._
-
-import scala.collection.mutable.SynchronizedQueue
+import scala.collection.mutable
 import scala.util.Random
 
 object Scala2dCAThreading {
@@ -16,23 +15,23 @@ object Scala2dCAThreading {
 class RunCAThreading extends PApplet {
 
   val res = 1
-  val complexity = 5
-  val screenBuffer = new SynchronizedQueue[Vector[Boolean]]
+  val complexity = 11
+  val screenBuffer = new mutable.SynchronizedQueue[Vector[Boolean]]
   var screenOffset = 0
 
   def screenCellCount = (width * height) / (res * res)
 
-  override def settings {
+  override def settings() {
     size(2560, 1440) //, "processing.opengl.PGraphics2D")
-    fullScreen
-    noSmooth
+    fullScreen()
+    noSmooth()
   }
 
-  override def setup {
+  override def setup() {
     frameRate(32)
-    noStroke
-    t.init
-    t.start
+    noStroke()
+    t.init()
+    t.start()
     println("---- CA simulation starts ----")
     println("Screen resolution: " + width + "*" + height)
     println("Screen cell count: " + screenCellCount)
@@ -42,11 +41,11 @@ class RunCAThreading extends PApplet {
     println("Number of possible rules: " + math.pow(2, math.pow(2, complexity)).toLong)
   }
 
-  override def keyPressed {
-    if (key.equals(' ')) {
-      screenBuffer.clear
+  override def keyPressed() {
+    if (key equals ' ') {
+      screenBuffer.clear()
       screenOffset = 0
-      t.init
+      t.init()
     }
   }
 
@@ -54,18 +53,20 @@ class RunCAThreading extends PApplet {
 
     var rule, gen = Vector[Boolean]()
 
-    def init {
+    def init() {
       // Interesting rules
       // 00111011
       // 01110100110111001000010011011010, 01010011100000011110110000110101
       // 11011111010100001011001010101110100111000011001110010110101010101101110000101101101000111011101101001001110100111000101100111111
+      // 10000001000110011111001100001111001111001001110101010110110011110001001011100010100010100001001111101101100010010000101111001111
+      // 00000010100000001010010101001001001000000011100010100001011110001010100100110111001111110100101001100000101000101011100110001001
       rule = (1 to math.pow(2, complexity).toInt map (_ => Random.nextBoolean())).toVector
       gen = (1 to width / res map (_ => Random.nextBoolean())).toVector
       println("---- New rule starts ----")
       println("Rule ID: " + rule.map { case (b) => if (b) 1 else 0 }.mkString)
     }
 
-    override def run {
+    override def run() {
       while (true) {
         gen = compute(gen, rule, (complexity - 1) / 2)
         screenBuffer.enqueue(gen)
@@ -73,7 +74,7 @@ class RunCAThreading extends PApplet {
     }
   }
 
-  override def draw {
+  override def draw() {
 
     def findline(x: Int) = (screenOffset + x) / (width / res) * res
     def findcol(y: Int) = (screenOffset + y) % (width / res) * res
@@ -87,7 +88,7 @@ class RunCAThreading extends PApplet {
         }
         screenOffset = screenOffset + gen.length
         if (screenOffset >= screenCellCount) {
-          screenBuffer.clear
+          screenBuffer.clear()
           screenOffset = 0
         }
     }
