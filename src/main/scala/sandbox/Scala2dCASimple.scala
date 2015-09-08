@@ -1,6 +1,7 @@
 package sandbox
 
-import com.lms.ca.model.CellularAutomata._
+import com.lms.ca.CAModel
+import CAModel._
 import processing.core._
 
 import scala.util.Random
@@ -35,7 +36,7 @@ class RunCA extends PApplet {
 
   override def draw {
 
-    gen = compute(gen, rule, 3).toVector
+    gen = computeGeneration(gen, rule, 3).toVector
     gen.zipWithIndex.foreach {
       case (cell, index) =>
         if (cell) fill(0) else fill(255)

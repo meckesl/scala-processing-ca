@@ -1,8 +1,8 @@
-package com.lms.ca.model
+package com.lms.ca
 
-object CellularAutomata {
+object CAModel {
 
-  def compute(gen: => Seq[Boolean], rule: Seq[Boolean], complexity: Int): Seq[Boolean] = {
+  def computeGeneration(gen: => Seq[Boolean], rule: Seq[Boolean], complexity: Int): Seq[Boolean] = {
 
     def child(siblings: Seq[Boolean]): Boolean = {
       implicit def b2i(b: Boolean) = if (b) 1 else 0
