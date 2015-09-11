@@ -6,6 +6,7 @@ http://www.scala-lang.org/docu/files/collections-api/collections_40.html
 https://github.com/mbonaci/scala
 http://www.scala-lang.org/old/node/8610
 https://pragprog.com/magazines/2012-01/scala-for-the-intrigued
+https://jazzy.id.au
 
 Scala Actors
 http://www.reactive.io/tips/2014/04/08/parallel-computing-made-easy-with-scala-and-akka/
