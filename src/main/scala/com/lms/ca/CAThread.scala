@@ -11,7 +11,7 @@ class CAThread(param: CAThreadParam) extends Thread {
   start()
 
   def reset(newRule: Boolean) {
-    param.screenBuffer.clear()
+    param.screenBuffer clear
     if (newRule) {
       rule = (1 to math.pow(2, param.complexity).toInt map (_ => Random.nextBoolean())).toVector
       gen = (1 to param.width / param.res map (_ => Random.nextBoolean())).toVector
